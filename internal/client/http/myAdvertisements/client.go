@@ -16,3 +16,10 @@ func HttpGetMyAdvertisements(t *testing.T, token string, limit int) *http.Respon
 		Expect(t).
 		End().Response
 }
+
+func HttpGetAdvertisements(t *testing.T, token, textForSearch string) *http.Response {
+	return apiRunner.GetRunner().Auth(token).Create().Get(path.AdvertisementsPath).Query("search", textForSearch).
+	Expect(t).
+	End().Response
+}
+
