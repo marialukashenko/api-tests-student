@@ -1,10 +1,9 @@
 package fixtures
 
 import (
-	"image"
-	"image/png"
 	"os"
 	"path/filepath"
+	"runtime"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -52,15 +51,44 @@ func LoginPair(t *testing.T) (authModels.LoginOkResponse, authModels.LoginOkResp
 }
 
 // NewCreateRequest формирует уникальное объявление со всеми полями и фотографиями
+//
+//	func NewCreateRequest(t *testing.T) adModels.CreateRequest {
+//		t.Helper()
+//		photoPath := filepath.Join(t.TempDir(), "photo.png")
+//		file, err := os.Create(photoPath)
+//		require.NoError(t, err, "Не удалось создать тестовую фотографию")
+//		encodeErr := png.Encode(file, image.NewRGBA(image.Rect(0, 0, 2, 2)))
+//		closeErr := file.Close()
+//		require.NoError(t, encodeErr, "Не удалось записать PNG")
+//		require.NoError(t, closeErr, "Не удалось закрыть PNG")
+//		return adModels.CreateRequest{
+//			Fields: map[string]string{
+//				"title":       "API-test-" + utils.RandomString(16),
+//				"description": Description,
+//				"price":       Price,
+//				"quantity":    Quantity,
+//			},
+//			Photos: []string{photoPath},
+//		}
+//	}
+//
+// NewCreateRequest формирует уникальное объявление
+// со всеми полями и тестовой фотографией.
 func NewCreateRequest(t *testing.T) adModels.CreateRequest {
 	t.Helper()
-	photoPath := filepath.Join(t.TempDir(), "photo.png")
-	file, err := os.Create(photoPath)
-	require.NoError(t, err, "Не удалось создать тестовую фотографию")
-	encodeErr := png.Encode(file, image.NewRGBA(image.Rect(0, 0, 2, 2)))
-	closeErr := file.Close()
-	require.NoError(t, encodeErr, "Не удалось записать PNG")
-	require.NoError(t, closeErr, "Не удалось закрыть PNG")
+
+	_, filename, _, ok := runtime.Caller(0)
+	require.True(t, ok, "Не удалось определить путь к фикстуре")
+
+	photoPath := filepath.Join(
+		filepath.Dir(filename),
+		"..",
+		"testdata",
+		"photo.png",
+	)
+
+	require.FileExists(t, photoPath, "Тестовая фотография не найдена")
+
 	return adModels.CreateRequest{
 		Fields: map[string]string{
 			"title":       "API-test-" + utils.RandomString(16),

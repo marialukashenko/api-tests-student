@@ -32,13 +32,14 @@ func (s *TestSuite) TearDownSuite() {
 
 const (
 	existingAdTitle = "замай" // полное название вашего объявления
-	searchBeginning = "за" // подстрока из начала
-	searchMiddle = "ама" // подстрока из середины
-	searchEnd = "май" // подстрока из конца
+	searchBeginning = "за"    // подстрока из начала
+	searchMiddle    = "ама"   // подстрока из середины
+	searchEnd       = "май"   // подстрока из конца
 )
+
 func (s *TestSuite) SetupSuite() {
 	base.SetupSuite()
-	
+
 	base.Precondition("Проверяем, что константы заданы")
 	require.NotEmpty(s.T(), existingAdTitle, "задайте existingAdTitle")
 	require.NotEmpty(s.T(), searchBeginning, "задайте searchBeginning")
@@ -49,11 +50,11 @@ func (s *TestSuite) SetupSuite() {
 
 func (s *TestSuite) TestSearchByTitle() {
 	list := advList.GetAdvertisementsList(s.T(), s.loginData.Token, searchMiddle)
-	
+
 	s.Run("В ответе есть хотя бы одно объявление", func() {
 		require.NotEmpty(s.T(), list.Items)
 	})
-	
+
 	s.Run("Среди найденных есть наше объявление", func() {
 		assertions.ContainsAdvertisementByTitle(s.T(), list.Items, existingAdTitle)
 	})
